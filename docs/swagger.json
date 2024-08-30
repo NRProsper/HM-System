@@ -1,0 +1,250 @@
+{
+    "swagger": "2.0",
+    "info": {
+      "title": "Health Management System",
+      "description": "An API for managing sign up, login, and logout",
+      "version": "1.0.0"
+    },
+    "host": "localhost:661", 
+    "basePath": "/api",
+    "schemes": [
+      "http",
+      "https"
+    ],
+    "paths": {
+      "/user/signup": {
+        "post": {
+          "summary": "User sign up registration",
+          "description": "Add a new user through sign up for the first time for subsequent logins.",
+          "tags": [
+            "User"
+          ],
+          "parameters": [
+            {
+              "in": "body",
+              "name": "body",
+              "schema": {
+                "$ref": "#/definitions/signup"
+              },
+              "required": true,
+              "description": "User data"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Success"
+            },
+            "400": {
+              "description": "Invalid input"
+            }
+          }
+        }
+      },
+      "/user/login": {
+        "post": {
+          "summary": "User login",
+          "description": "User logs in with their credentials.",
+          "tags": [
+            "User"
+          ],
+          "parameters": [
+            {
+              "in": "body",
+              "name": "body",
+              "schema": {
+                "$ref": "#/definitions/login"
+              },
+              "required": true,
+              "description": "Login credentials"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Success"
+            },
+            "401": {
+              "description": "Unauthorized"
+            }
+          }
+        }
+      },
+      "/user/logout": {
+        "get": {
+          "summary": "User logout",
+          "description": "User logs out of their account in the health management system.",
+          "tags": [
+            "User"
+          ],
+          "responses": {
+            "200": {
+              "description": "Successfully logged out."
+            },
+            "404": {
+              "description": "User not found"
+            },
+            "500": {
+              "description": "Internal server error"
+            }
+          }
+        }
+      },
+      "/contact-us/contact-us": {
+        "post": {
+          "summary": "Create a message to the administrator",
+          "description": "The user can send a message to the health management administrator.",
+          "tags": [
+            "Contact-us"
+          ],
+          "parameters": [
+            {
+              "in": "body",
+              "name": "body",
+              "schema": {
+                "$ref": "#/definitions/contact-us"
+              },
+              "required": true,
+              "description": "Contact message data"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Message sent successfully"
+            },
+            "400": {
+              "description": "Invalid input"
+            }
+          }
+        }
+      },
+      "/contact-us/listMessage": {
+        "get": {
+          "summary": "List all user messages",
+          "description": "Retrieve a list of all user messages from the database.",
+          "tags": [
+            "Contact-us"
+          ],
+          "responses": {
+            "200": {
+              "description": "Successfully retrieved list of messages",
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/definitions/contact-us"
+                }
+              }
+            },
+            "404": {
+              "description": "No messages found"
+            },
+            "500": {
+              "description": "Internal server error"
+            }
+          }
+        }
+      },
+      "/contact-us/delete/{id}": {
+        "delete": {
+          "summary": "Delete a message by ID",
+          "description": "Delete a message by its ID.",
+          "tags": [
+            "Contact-us"
+          ],
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "description": "ID of the message to delete",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "204": {
+              "description": "Message deleted"
+            },
+            "404": {
+              "description": "Message not found"
+            }
+          }
+        }
+      }
+    },
+    "tags": [
+      {
+        "name": "User",
+        "description": "Endpoints for user management in the health management system"
+      },
+      {
+        "name": "Contact-us",
+        "description": "Endpoints for sending and managing user messages"
+      }
+    ],
+    "definitions": {
+      "signup": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "description": "The name of the user"
+          },
+          "email": {
+            "type": "string",
+            "description": "The email of the user",
+            "format": "email"
+          },
+          "password": {
+            "type": "string",
+            "description": "The password to be used for logging in"
+          },
+          "role": {
+            "type": "string",
+            "description": "Role of the user (e.g., doctor, nurse)",
+            "enum": ["doctor", "nurse", "receptionist", "admin"],
+            "default": "doctor"
+          }
+        },
+        "required": ["username", "email", "password"]
+      },
+      "login": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "The email of the user",
+            "format": "email"
+          },
+          "password": {
+            "type": "string",
+            "description": "The password to be used for logging in"
+          }
+        },
+        "required": ["email", "password"]
+      },
+      "contact-us": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The name of the user sending the message"
+          },
+          "email": {
+            "type": "string",
+            "description": "The email of the user sending the message",
+            "format": "email"
+          },
+          "subject": {
+            "type": "string",
+            "description": "The subject of the message"
+          },
+          "message": {
+            "type": "string",
+            "description": "The message content"
+          }
+        },
+        "required": ["name", "email", "subject", "message"]
+      }
+    }
+  }
+  
