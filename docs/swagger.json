@@ -1,250 +1,356 @@
 {
-    "swagger": "2.0",
-    "info": {
-      "title": "Health Management System",
-      "description": "An API for managing sign up, login, and logout",
-      "version": "1.0.0"
+  "swagger": "2.0",
+  "info": {
+    "title": "Health Management System",
+    "description": "An API for managing CareSync",
+    "version": "1.0.0"
+  },
+  "host": "localhost:661",
+  "basePath": "/api",
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "paths": {
+    "/user/signup": {
+      "post": {
+        "summary": "User sign up registration",
+        "description": "Add a new user through sign up for the first time for subsequent logins.",
+        "tags": ["User"],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/signup"
+            },
+            "required": true,
+            "description": "User data"
+          }
+        ],
+        "responses": {
+          "200": { "description": "Success" },
+          "400": { "description": "Invalid input" }
+        }
+      }
     },
-    "host": "localhost:661", 
-    "basePath": "/api",
-    "schemes": [
-      "http",
-      "https"
-    ],
-    "paths": {
-      "/user/signup": {
-        "post": {
-          "summary": "User sign up registration",
-          "description": "Add a new user through sign up for the first time for subsequent logins.",
-          "tags": [
-            "User"
-          ],
-          "parameters": [
-            {
-              "in": "body",
-              "name": "body",
-              "schema": {
-                "$ref": "#/definitions/signup"
-              },
-              "required": true,
-              "description": "User data"
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "Success"
+    "/user/login": {
+      "post": {
+        "summary": "User login",
+        "description": "User logs in with their credentials.",
+        "tags": ["User"],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/login"
             },
-            "400": {
-              "description": "Invalid input"
-            }
+            "required": true,
+            "description": "Login credentials"
           }
+        ],
+        "responses": {
+          "200": { "description": "Success" },
+          "401": { "description": "Unauthorized" }
         }
-      },
-      "/user/login": {
-        "post": {
-          "summary": "User login",
-          "description": "User logs in with their credentials.",
-          "tags": [
-            "User"
-          ],
-          "parameters": [
-            {
-              "in": "body",
-              "name": "body",
-              "schema": {
-                "$ref": "#/definitions/login"
-              },
-              "required": true,
-              "description": "Login credentials"
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "Success"
+      }
+    },
+    "/user/logout": {
+      "get": {
+        "summary": "User logout",
+        "description": "User logs out of their account in the health management system.",
+        "tags": ["User"],
+        "responses": {
+          "200": { "description": "Successfully logged out." },
+          "404": { "description": "User not found" },
+          "500": { "description": "Internal server error" }
+        }
+      }
+    },
+    "/contact-us/contact-us": {
+      "post": {
+        "summary": "Create a message to the administrator",
+        "description": "The user can send a message to the health management administrator.",
+        "tags": ["Contact-us"],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/contact-us"
             },
-            "401": {
-              "description": "Unauthorized"
-            }
+            "required": true,
+            "description": "Contact message data"
           }
+        ],
+        "responses": {
+          "200": { "description": "Message sent successfully" },
+          "400": { "description": "Invalid input" }
         }
-      },
-      "/user/logout": {
-        "get": {
-          "summary": "User logout",
-          "description": "User logs out of their account in the health management system.",
-          "tags": [
-            "User"
-          ],
-          "responses": {
-            "200": {
-              "description": "Successfully logged out."
-            },
-            "404": {
-              "description": "User not found"
-            },
-            "500": {
-              "description": "Internal server error"
-            }
-          }
-        }
-      },
-      "/contact-us/contact-us": {
-        "post": {
-          "summary": "Create a message to the administrator",
-          "description": "The user can send a message to the health management administrator.",
-          "tags": [
-            "Contact-us"
-          ],
-          "parameters": [
-            {
-              "in": "body",
-              "name": "body",
-              "schema": {
+      }
+    },
+    "/contact-us/listMessage": {
+      "get": {
+        "summary": "List all user messages",
+        "description": "Retrieve a list of all user messages from the database.",
+        "tags": ["Contact-us"],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved list of messages",
+            "schema": {
+              "type": "array",
+              "items": {
                 "$ref": "#/definitions/contact-us"
-              },
-              "required": true,
-              "description": "Contact message data"
+              }
             }
-          ],
-          "responses": {
-            "200": {
-              "description": "Message sent successfully"
-            },
-            "400": {
-              "description": "Invalid input"
-            }
-          }
+          },
+          "404": { "description": "No messages found" },
+          "500": { "description": "Internal server error" }
         }
-      },
-      "/contact-us/listMessage": {
-        "get": {
-          "summary": "List all user messages",
-          "description": "Retrieve a list of all user messages from the database.",
-          "tags": [
-            "Contact-us"
-          ],
-          "responses": {
-            "200": {
-              "description": "Successfully retrieved list of messages",
-              "schema": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/definitions/contact-us"
+      }
+    },
+    "/contact-us/delete/{id}": {
+      "delete": {
+        "summary": "Delete a message by ID",
+        "description": "Delete a message by its ID.",
+        "tags": ["Contact-us"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of the message to delete",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "204": { "description": "Message deleted" },
+          "404": { "description": "Message not found" }
+        }
+      }
+    },
+    "/department/add": {
+      "post": {
+        "summary": "The admin adds a department in the database",
+        "description": "The administrator adds a new department in the database for appointments in the hospital or clinic.",
+        "tags": ["Department"],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/department"
+            },
+            "required": true,
+            "description": "Enter department details here"
+          }
+        ],
+        "responses": {
+          "200": { "description": "Success" }
+        }
+      }
+    },
+    "/department/NameOfAllDepartment": {
+      "get": {
+        "summary": "List of names of all departments",
+        "description": "Retrieve the list of names of all departments from the database.",
+        "tags": ["Department"],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved a list of all department names",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array"
                 }
               }
-            },
-            "404": {
-              "description": "No messages found"
-            },
-            "500": {
-              "description": "Internal server error"
             }
-          }
-        }
-      },
-      "/contact-us/delete/{id}": {
-        "delete": {
-          "summary": "Delete a message by ID",
-          "description": "Delete a message by its ID.",
-          "tags": [
-            "Contact-us"
-          ],
-          "parameters": [
-            {
-              "name": "id",
-              "in": "path",
-              "description": "ID of the message to delete",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "responses": {
-            "204": {
-              "description": "Message deleted"
-            },
-            "404": {
-              "description": "Message not found"
-            }
-          }
+          },
+          "404": { "description": "Department not found" },
+          "500": { "description": "Internal server error" }
         }
       }
     },
-    "tags": [
-      {
-        "name": "User",
-        "description": "Endpoints for user management in the health management system"
-      },
-      {
-        "name": "Contact-us",
-        "description": "Endpoints for sending and managing user messages"
+    "/department/update/{id}": {
+      "put": {
+        "summary": "Update department details",
+        "description": "The administrator may want to change some information about the department details.",
+        "tags": ["Department"],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "ID of the department to update",
+            "required": true,
+            "schema": { "type": "string" }
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/department"
+            },
+            "required": true,
+            "description": "Enter updated department information here"
+          }
+        ],
+        "responses": {
+          "200": { "description": "Success" }
+        }
       }
-    ],
-    "definitions": {
-      "signup": {
-        "type": "object",
-        "properties": {
-          "username": {
-            "type": "string",
-            "description": "The name of the user"
-          },
-          "email": {
-            "type": "string",
-            "description": "The email of the user",
-            "format": "email"
-          },
-          "password": {
-            "type": "string",
-            "description": "The password to be used for logging in"
-          },
-          "role": {
-            "type": "string",
-            "description": "Role of the user (e.g., doctor, nurse)",
-            "enum": ["doctor", "nurse", "receptionist", "admin"],
-            "default": "doctor"
+    },
+    "/department/delete/{id}": {
+      "delete": {
+        "summary": "Delete department",
+        "description": "Administrator may want to delete a department by ID from the database.",
+        "tags": ["Department"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of the department to delete",
+            "required": true,
+            "schema": { "type": "string" }
           }
+        ],
+        "responses": {
+          "204": { "description": "Department deleted" },
+          "404": { "description": "Department not found" }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "User",
+      "description": "Endpoints for user management in the health management system"
+    },
+    {
+      "name": "Contact-us",
+      "description": "Endpoints for sending and managing user messages"
+    },
+    {
+      "name": "Department",
+      "description": "All credentials required for departments in the hospital or clinic"
+    }
+  ],
+  "definitions": {
+    "signup": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string",
+          "description": "The name of the user"
         },
-        "required": ["username", "email", "password"]
+        "email": {
+          "type": "string",
+          "description": "The email of the user",
+          "format": "email"
+        },
+        "password": {
+          "type": "string",
+          "description": "The password to be used for logging in"
+        },
+        "role": {
+          "type": "string",
+          "description": "Role of the user (e.g., doctor, nurse)",
+          "enum": ["doctor", "nurse", "receptionist", "admin"],
+          "default": "doctor"
+        }
       },
-      "login": {
-        "type": "object",
-        "properties": {
-          "email": {
-            "type": "string",
-            "description": "The email of the user",
-            "format": "email"
-          },
-          "password": {
-            "type": "string",
-            "description": "The password to be used for logging in"
-          }
+      "required": ["username", "email", "password"]
+    },
+    "login": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "description": "The email of the user",
+          "format": "email"
         },
-        "required": ["email", "password"]
+        "password": {
+          "type": "string",
+          "description": "The password to be used for logging in"
+        }
       },
-      "contact-us": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string",
-            "description": "The name of the user sending the message"
-          },
-          "email": {
-            "type": "string",
-            "description": "The email of the user sending the message",
-            "format": "email"
-          },
-          "subject": {
-            "type": "string",
-            "description": "The subject of the message"
-          },
-          "message": {
-            "type": "string",
-            "description": "The message content"
+      "required": ["email", "password"]
+    },
+    "contact-us": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the user sending the message"
+        },
+        "email": {
+          "type": "string",
+          "description": "The email of the user sending the message",
+          "format": "email"
+        },
+        "subject": {
+          "type": "string",
+          "description": "The subject of the message"
+        },
+        "message": {
+          "type": "string",
+          "description": "The message content"
+        }
+      },
+      "required": ["name", "email", "subject", "message"]
+    },
+    "department": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "required": true,
+          "description": "The name of the department"
+        },
+        "email": {
+          "type": "string",
+          "required": true,
+          "default": "@gmail.com",
+          "description": "The email used by the department"
+        },
+        "contact": {
+          "type": "string",
+          "required": true,
+          "description": "The mobile number or telephone number used by the department"
+        },
+        "description": {
+          "type": "string",
+          "description": "The explanation of this department"
+        },
+        "location": {
+          "type": "string",
+          "description": "The location of the department"
+        },
+        "largeDescription": {
+          "type": "string",
+          "description": "The sector location of the hospital"
+        },
+        "services": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "The name of the service in the given department"
+              },
+              "description": {
+                "type": "string",
+                "description": "The explanation of the service in the given department"
+              }
+            }
           }
         },
-        "required": ["name", "email", "subject", "message"]
+        "isActive": {
+          "type": "boolean",
+          "description": "This indicates whether the department is active or not"
+        }
       }
     }
   }
-  
+}
