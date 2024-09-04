@@ -8,7 +8,6 @@
   "host": "hm-system-923x.onrender.com",
   "basePath": "/api",
   "schemes": [
-    "http",
     "https"
   ],
   "paths": {
