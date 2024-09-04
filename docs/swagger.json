@@ -5,66 +5,162 @@
     "description": "An API for managing CareSync",
     "version": "1.0.0"
   },
-  "host": "https://hm-system-2wke.onrender.com",
+  "host": "hm-system-923x.onrender.com",
   "basePath": "/api",
   "schemes": [
-    "http",
     "https"
   ],
   "paths": {
-    "/user/signup": {
+    "/auth/signup": {
       "post": {
         "summary": "User sign up registration",
-        "description": "Add a new user through sign up for the first time for subsequent logins.",
-        "tags": ["User"],
+        "description": "Register a new user with required details.",
+        "tags": ["Auth"],
         "parameters": [
           {
             "in": "body",
             "name": "body",
+            "required": true,
+            "description": "User registration details",
             "schema": {
               "$ref": "#/definitions/signup"
-            },
-            "required": true,
-            "description": "User data"
+            }
           }
         ],
         "responses": {
-          "200": { "description": "Success" },
-          "400": { "description": "Invalid input" }
+          "201": {
+            "description": "User registered successfully"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "409": {
+            "description": "Email or phone number already in use"
+          }
         }
       }
     },
-    "/user/login": {
+    "/auth/login": {
       "post": {
         "summary": "User login",
-        "description": "User logs in with their credentials.",
-        "tags": ["User"],
+        "description": "Authenticate user and provide JWT token.",
+        "tags": ["Auth"],
         "parameters": [
           {
             "in": "body",
             "name": "body",
+            "required": true,
+            "description": "User login credentials",
             "schema": {
               "$ref": "#/definitions/login"
-            },
-            "required": true,
-            "description": "Login credentials"
+            }
           }
         ],
         "responses": {
-          "200": { "description": "Success" },
-          "401": { "description": "Unauthorized" }
+          "200": {
+            "description": "User logged in successfully"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Invalid email or password"
+          }
         }
       }
     },
-    "/user/logout": {
+    "/auth/logout": {
       "get": {
         "summary": "User logout",
-        "description": "User logs out of their account in the health management system.",
-        "tags": ["User"],
+        "description": "Clear session and log out user.",
+        "tags": ["Auth"],
         "responses": {
-          "200": { "description": "Successfully logged out." },
-          "404": { "description": "User not found" },
-          "500": { "description": "Internal server error" }
+          "200": {
+            "description": "Logout success"
+          }
+        }
+      }
+    },
+    "/staff/all": {
+      "get": {
+        "summary": "Retrieve all staff members",
+        "description": "Get a list of all staff members with optional filters for role and department ID.",
+        "tags": ["Staff"],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "role",
+            "type": "string",
+            "description": "Role of the staff member to filter by Role"
+          },
+          {
+            "in": "query",
+            "name": "departmentId",
+            "type": "string",
+            "description": "ID of the department to filter by Department"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved staff members",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Staff members retrieved successfully"
+                },
+                "staff": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/Staff"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No staff members found for the provided filters"
+          }
+        }
+      }
+    },
+    "/staff/single/{id}": {
+      "get": {
+        "summary": "Retrieve a staff member by ID",
+        "description": "Get details of a staff member by their unique ID.",
+        "tags": ["Staff"],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "type": "string",
+            "required": true,
+            "description": "ID of the staff member"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved the staff member",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Staff member retrieved successfully"
+                },
+                "staff": {
+                  "$ref": "#/definitions/Staff"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Staff ID is required"
+          },
+          "404": {
+            "description": "Staff member not found"
+          }
         }
       }
     },
@@ -130,12 +226,63 @@
         }
       }
     },
-    "/department/add": {
+    "/departments": {
+      "get": {
+        "summary": "List of all departments",
+        "description": "Retrieve the list of all departments from the database.",
+        "tags": ["Department"],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved a list of all departments",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/department"
+              }
+            }
+          },
+          "404": { "description": "Departments not found" },
+          "500": { "description": "Internal server error" }
+        }
+      },
       "post": {
-        "summary": "The admin adds a department in the database",
-        "description": "The administrator adds a new department in the database for appointments in the hospital or clinic.",
+        "summary": "Create a new department",
+        "description": "This route is used to create a new department in the clinic.",
         "tags": ["Department"],
         "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/department"
+            },
+            "description": "Department data to be created"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Department created successfully",
+            "schema": {
+              "$ref": "#/definitions/department"
+            }
+          },
+          "400": { "description": "Invalid input data" },
+          "500": { "description": "Internal server error" }
+        }
+      },
+      "put": {
+        "summary": "Update a department",
+        "description": "Update the details of an existing department by ID.",
+        "tags": ["Department"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "ID of the department to update",
+            "schema": { "type": "string" }
+          },
           {
             "in": "body",
             "name": "body",
@@ -143,88 +290,78 @@
               "$ref": "#/definitions/department"
             },
             "required": true,
-            "description": "Enter department details here"
+            "description": "Updated department details"
           }
         ],
         "responses": {
-          "200": { "description": "Success" }
+          "200": { "description": "Department updated successfully" },
+          "404": { "description": "Department not found" },
+          "400": { "description": "Invalid input" }
         }
-      }
-    },
-    "/department/NameOfAllDepartment": {
-      "get": {
-        "summary": "List of names of all departments",
-        "description": "Retrieve the list of names of all departments from the database.",
+      },
+      "delete": {
+        "summary": "Delete a department",
+        "description": "Delete a department from the database using its ID.",
         "tags": ["Department"],
-        "responses": {
-          "200": {
-            "description": "Successfully retrieved a list of all department names",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array"
-                }
-              }
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the department to delete",
+            "schema": {
+              "type": "string"
             }
-          },
+          }
+        ],
+        "responses": {
+          "204": { "description": "Department deleted successfully" },
           "404": { "description": "Department not found" },
           "500": { "description": "Internal server error" }
         }
       }
     },
-    "/department/update/{id}": {
-      "put": {
-        "summary": "Update department details",
-        "description": "The administrator may want to change some information about the department details.",
+    "/departments/{id}": {
+      "get": {
+        "summary": "Get a department by ID",
+        "description": "Retrieve a department's details from the database using its unique ID.",
         "tags": ["Department"],
         "parameters": [
           {
-            "in": "path",
             "name": "id",
-            "description": "ID of the department to update",
+            "in": "path",
             "required": true,
-            "schema": { "type": "string" }
-          },
-          {
-            "in": "body",
-            "name": "body",
+            "description": "The unique identifier of the department",
             "schema": {
-              "$ref": "#/definitions/department"
-            },
-            "required": true,
-            "description": "Enter updated department information here"
+              "type": "string"
+            }
           }
         ],
         "responses": {
-          "200": { "description": "Success" }
-        }
-      }
-    },
-    "/department/delete/{id}": {
-      "delete": {
-        "summary": "Delete department",
-        "description": "Administrator may want to delete a department by ID from the database.",
-        "tags": ["Department"],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "ID of the department to delete",
-            "required": true,
-            "schema": { "type": "string" }
+          "200": {
+            "description": "Successfully retrieved the department",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/definitions/department"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Department not found"
+          },
+          "500": {
+            "description": "Internal server error"
           }
-        ],
-        "responses": {
-          "204": { "description": "Department deleted" },
-          "404": { "description": "Department not found" }
         }
       }
     }
   },
   "tags": [
     {
-      "name": "User",
-      "description": "Endpoints for user management in the health management system"
+      "name": "Auth",
+      "description": "Endpoints  related to authentication and User creation"
     },
     {
       "name": "Contact-us",
@@ -233,20 +370,36 @@
     {
       "name": "Department",
       "description": "All credentials required for departments in the hospital or clinic"
+    },
+    {
+      "name": "Staff",
+      "description": "This endpoint deals with staff related things"
     }
   ],
   "definitions": {
     "signup": {
       "type": "object",
       "properties": {
-        "username": {
+        "firstName": {
           "type": "string",
-          "description": "The name of the user"
+          "description": "The first name of the user"
+        },
+        "lastName": {
+          "type": "string",
+          "description": "The last name of the user"
         },
         "email": {
           "type": "string",
           "description": "The email of the user",
           "format": "email"
+        },
+        "phone": {
+          "type": "string",
+          "description": "The phone number of the user"
+        },
+        "description": {
+          "type": "string",
+          "description": "A brief description about the user"
         },
         "password": {
           "type": "string",
@@ -254,12 +407,15 @@
         },
         "role": {
           "type": "string",
-          "description": "Role of the user (e.g., doctor, nurse)",
-          "enum": ["doctor", "nurse", "receptionist", "admin"],
-          "default": "doctor"
+          "description": "Role of the user (e.g., doctor, nurse, receptionist, admin)",
+          "enum": ["doctor", "nurse", "receptionist", "admin"]
+        },
+        "departmentId": {
+          "type": "string",
+          "description": "The ID of the department the user is associated with"
         }
       },
-      "required": ["username", "email", "password"]
+      "required": ["firstName", "lastName", "email", "phone", "password", "role"]
     },
     "login": {
       "type": "object",
@@ -307,50 +463,77 @@
           "required": true,
           "description": "The name of the department"
         },
-        "email": {
+        "description": {
           "type": "string",
           "required": true,
-          "default": "@gmail.com",
-          "description": "The email used by the department"
+          "description": "The explanation of this department"
         },
         "contact": {
           "type": "string",
           "required": true,
-          "description": "The mobile number or telephone number used by the department"
+          "description": "The contact number of the department"
         },
-        "description": {
+        "email": {
           "type": "string",
-          "description": "The explanation of this department"
+          "required": true,
+          "description": "The email address of the department"
         },
         "location": {
           "type": "string",
-          "description": "The location of the department"
+          "required": true,
+          "description": "The physical location of the department"
         },
         "largeDescription": {
           "type": "string",
-          "description": "The sector location of the hospital"
+          "description": "Detailed description of the department"
         },
         "services": {
           "type": "array",
           "items": {
-            "type": "object",
-            "properties": {
-              "name": {
-                "type": "string",
-                "description": "The name of the service in the given department"
-              },
-              "description": {
-                "type": "string",
-                "description": "The explanation of the service in the given department"
-              }
-            }
-          }
+            "type": "string",
+            "description": "List of services offered by the department"
+          },
+          "required": true
         },
         "isActive": {
           "type": "boolean",
-          "description": "This indicates whether the department is active or not"
+          "default": true,
+          "description": "Indicates whether the department is active"
         }
-      }
+      },
+      "required": ["name", "description", "contact", "email", "location", "services"]
+    },
+    "Staff": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the staff member"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the staff member"
+        },
+        "role": {
+          "type": "string",
+          "description": "Role of the staff member",
+          "enum": ["doctor", "nurse", "receptionist", "admin"]
+        },
+        "departmentId": {
+          "type": "string",
+          "description": "ID of the department the staff member is associated with"
+        },
+        "email": {
+          "type": "string",
+          "description": "Email of the staff member",
+          "format": "email"
+        },
+        "phone": {
+          "type": "string",
+          "description": "Phone number of the staff member"
+        }
+      },
+      "required": ["id", "name", "role", "departmentId", "email", "phone"]
     }
   }
 }

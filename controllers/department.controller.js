@@ -2,6 +2,35 @@ import departmentModel from '../models/department.model.js';
 import asyncWrapper from "../middlewares/async.js";
 import { BadRequestError } from "../errors/BadRequestError.js";
 import { validationResult } from "express-validator";
+import DepartmentModel from "../models/department.model.js";
+import {NotFoundError} from "../errors/index.js";
+
+export const getAllDepartments = asyncWrapper(
+    async (req, res) => {
+        const departments = await DepartmentModel.find();
+        return res.status(200).json(
+            {
+                departments: departments,
+                message: "Departments retrieved successfully"
+            }
+        );
+    }
+)
+
+export const getDepartmentById = asyncWrapper(async (req, res, next) => {
+    const { id } = req.params;
+
+    // Find the department by its ID
+    const department = await DepartmentModel.findById(id);
+
+    // If the department doesn't exist, throw a NotFoundError
+    if (!department) {
+        throw new NotFoundError(`Department with ID ${id} not found`);
+    }
+
+    // Return the department data
+    res.status(200).json(department);
+});
 
 // Create a new department
 export const createDepartment = asyncWrapper(async (req, res, next) => {
@@ -10,7 +39,7 @@ export const createDepartment = asyncWrapper(async (req, res, next) => {
         throw new BadRequestError(errors.array());
     }
 
-    const { name, description, contact, email, location, largeDescription, services, isActive } = req.body;
+    const { name, description, contact, email, location, largeDescription, services } = req.body;
 
     // Check if the department already exists
     const existingDepartment = await departmentModel.findOne({ name });
@@ -19,32 +48,20 @@ export const createDepartment = asyncWrapper(async (req, res, next) => {
     }
 
     // Create and save the new department
-    const department = new departmentModel({
+    const department = new DepartmentModel({
         name,
         description,
         contact,
         email,
         location,
         largeDescription,
-        services,
-        isActive
+        services
     });
 
     await department.save();
     res.status(201).json(department);
 });
 
-// Find a department by name
-export const findDepartmentByName = asyncWrapper(async (req, res, next) => {
-    const { name } = req.params;
-
-    const department = await departmentModel.findOne({ name });
-    if (!department) {
-        return res.status(404).json({ message: 'Department not found' });
-    }
-
-    res.status(200).json(department);
-});
 
 // Update a department
 export const updateDepartment = asyncWrapper(async (req, res, next) => {
@@ -80,19 +97,11 @@ export const updateDepartment = asyncWrapper(async (req, res, next) => {
 });
 
 // Delete a department
-export const deleteDepartment = asyncWrapper(async (req, res, next) => {
-    const { id } = req.params;
-
-    const deletedDepartment = await departmentModel.findByIdAndDelete(id);
-
-    if (!deletedDepartment) {
-        return res.status(404).json({ message: 'Department not found' });
+export const deleteDepartment = asyncWrapper(async (req, res) => {
+    const {id} = req.params;
+    const department = await DepartmentModel.findByIdAndDelete(id);
+    if(!department) {
+        return res.status(404).json({message: `No such department with id: ${id}`})
     }
-
-    res.status(200).json({ message: 'Department deleted successfully' });
-});
-export const listDepartments = asyncWrapper(async (req, res, next) => {
-
-    const department = await departmentModel.find({}, 'name');
-    res.status(200).json({message:"A list of all department is retrieved successfully" ,department});
+    res.status(210).json({message: "department deleted successfully"})
 });

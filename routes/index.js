@@ -1,10 +1,14 @@
 import express from 'express';
-import {userRouter} from './user.routes.js';
-import {contactRoute} from './contact-us.routes.js';
-import { departmentRoute } from './department.routes.js';
+import userRouter from './user.routes.js';
+import contactRoute from './contact-us.routes.js';
+import departmentRoute  from './department.routes.js';
+import staffRoutes from "./staff.routes.js";
 
-export const routes = express.Router();
+const routes = express.Router();
 
-routes.use('/user', userRouter);
+routes.use('/auth', userRouter);
 routes.use("/contact-us",contactRoute);
-routes.use('/department',departmentRoute);
+routes.use('/departments', departmentRoute);
+routes.use('/staff', staffRoutes);
+
+export default routes;

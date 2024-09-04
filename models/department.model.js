@@ -28,17 +28,10 @@ const departmentSchema = new mongoose.Schema({
     largeDescription: {
         type: String
     },
-    services: [
-        {
-            name: {
-                type: String,
-                required: true
-            },
-            description: {
-                type: String
-            }
-        }
-    ],
+    services: {
+        type: [String],
+        required: true
+    },
     isActive: {
         type: Boolean,
         default: true
