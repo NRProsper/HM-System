@@ -132,36 +132,59 @@
     },
     "/departments": {
       "get": {
-        "summary": "List of names of all departments",
-        "description": "Retrieve the list of names of all departments from the database.",
+        "summary": "List of all departments",
+        "description": "Retrieve the list of all departments from the database.",
         "tags": ["Department"],
         "responses": {
           "200": {
-            "description": "Successfully retrieved a list of all department names",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array"
-                }
+            "description": "Successfully retrieved a list of all departments",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/department"
               }
             }
           },
-          "404": { "description": "Department not found" },
+          "404": { "description": "Departments not found" },
           "500": { "description": "Internal server error" }
         }
-      }
-    },
-    "/department/update/{id}": {
-      "put": {
-        "summary": "Update department details",
-        "description": "The administrator may want to change some information about the department details.",
+      },
+      "post": {
+        "summary": "Create a new department",
+        "description": "This route is used to create a new department in the clinic.",
         "tags": ["Department"],
         "parameters": [
           {
-            "in": "path",
-            "name": "id",
-            "description": "ID of the department to update",
+            "in": "body",
+            "name": "body",
             "required": true,
+            "schema": {
+              "$ref": "#/definitions/department"
+            },
+            "description": "Department data to be created"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Department created successfully",
+            "schema": {
+              "$ref": "#/definitions/department"
+            }
+          },
+          "400": { "description": "Invalid input data" },
+          "500": { "description": "Internal server error" }
+        }
+      },
+      "put": {
+        "summary": "Update a department",
+        "description": "Update the details of an existing department by ID.",
+        "tags": ["Department"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "ID of the department to update",
             "schema": { "type": "string" }
           },
           {
@@ -171,31 +194,70 @@
               "$ref": "#/definitions/department"
             },
             "required": true,
-            "description": "Enter updated department information here"
+            "description": "Updated department details"
           }
         ],
         "responses": {
-          "200": { "description": "Success" }
+          "200": { "description": "Department updated successfully" },
+          "404": { "description": "Department not found" },
+          "400": { "description": "Invalid input" }
         }
-      }
-    },
-    "/department/delete/{id}": {
+      },
       "delete": {
-        "summary": "Delete department",
-        "description": "Administrator may want to delete a department by ID from the database.",
+        "summary": "Delete a department",
+        "description": "Delete a department from the database using its ID.",
         "tags": ["Department"],
         "parameters": [
           {
             "name": "id",
             "in": "path",
-            "description": "ID of the department to delete",
             "required": true,
-            "schema": { "type": "string" }
+            "description": "The ID of the department to delete",
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
-          "204": { "description": "Department deleted" },
-          "404": { "description": "Department not found" }
+          "204": { "description": "Department deleted successfully" },
+          "404": { "description": "Department not found" },
+          "500": { "description": "Internal server error" }
+        }
+      }
+    },
+    "/departments/{id}": {
+      "get": {
+        "summary": "Get a department by ID",
+        "description": "Retrieve a department's details from the database using its unique ID.",
+        "tags": ["Department"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the department",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved the department",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/definitions/department"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Department not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
         }
       }
     }
@@ -286,50 +348,45 @@
           "required": true,
           "description": "The name of the department"
         },
-        "email": {
+        "description": {
           "type": "string",
           "required": true,
-          "default": "@gmail.com",
-          "description": "The email used by the department"
+          "description": "The explanation of this department"
         },
         "contact": {
           "type": "string",
           "required": true,
-          "description": "The mobile number or telephone number used by the department"
+          "description": "The contact number of the department"
         },
-        "description": {
+        "email": {
           "type": "string",
-          "description": "The explanation of this department"
+          "required": true,
+          "description": "The email address of the department"
         },
         "location": {
           "type": "string",
-          "description": "The location of the department"
+          "required": true,
+          "description": "The physical location of the department"
         },
         "largeDescription": {
           "type": "string",
-          "description": "The sector location of the hospital"
+          "description": "Detailed description of the department"
         },
         "services": {
           "type": "array",
           "items": {
-            "type": "object",
-            "properties": {
-              "name": {
-                "type": "string",
-                "description": "The name of the service in the given department"
-              },
-              "description": {
-                "type": "string",
-                "description": "The explanation of the service in the given department"
-              }
-            }
-          }
+            "type": "string",
+            "description": "List of services offered by the department"
+          },
+          "required": true
         },
         "isActive": {
           "type": "boolean",
-          "description": "This indicates whether the department is active or not"
+          "default": true,
+          "description": "Indicates whether the department is active"
         }
-      }
+      },
+      "required": ["name", "description", "contact", "email", "location", "services"]
     }
   }
 }
