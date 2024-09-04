@@ -15,7 +15,7 @@
       "post": {
         "summary": "User sign up registration",
         "description": "Register a new user with required details.",
-        "tags": ["User"],
+        "tags": ["Auth"],
         "parameters": [
           {
             "in": "body",
@@ -44,7 +44,7 @@
       "post": {
         "summary": "User login",
         "description": "Authenticate user and provide JWT token.",
-        "tags": ["User"],
+        "tags": ["Auth"],
         "parameters": [
           {
             "in": "body",
@@ -73,10 +73,93 @@
       "get": {
         "summary": "User logout",
         "description": "Clear session and log out user.",
-        "tags": ["User"],
+        "tags": ["Auth"],
         "responses": {
           "200": {
             "description": "Logout success"
+          }
+        }
+      }
+    },
+    "/staff/all": {
+      "get": {
+        "summary": "Retrieve all staff members",
+        "description": "Get a list of all staff members with optional filters for role and department ID.",
+        "tags": ["Staff"],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "role",
+            "type": "string",
+            "description": "Role of the staff member to filter by Role"
+          },
+          {
+            "in": "query",
+            "name": "departmentId",
+            "type": "string",
+            "description": "ID of the department to filter by Department"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved staff members",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Staff members retrieved successfully"
+                },
+                "staff": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/Staff"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No staff members found for the provided filters"
+          }
+        }
+      }
+    },
+    "/staff/single/{id}": {
+      "get": {
+        "summary": "Retrieve a staff member by ID",
+        "description": "Get details of a staff member by their unique ID.",
+        "tags": ["Staff"],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "type": "string",
+            "required": true,
+            "description": "ID of the staff member"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved the staff member",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Staff member retrieved successfully"
+                },
+                "staff": {
+                  "$ref": "#/definitions/Staff"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Staff ID is required"
+          },
+          "404": {
+            "description": "Staff member not found"
           }
         }
       }
@@ -277,8 +360,8 @@
   },
   "tags": [
     {
-      "name": "User",
-      "description": "Endpoints for user management in the health management system"
+      "name": "Auth",
+      "description": "Endpoints  related to authentication and User creation"
     },
     {
       "name": "Contact-us",
@@ -287,6 +370,10 @@
     {
       "name": "Department",
       "description": "All credentials required for departments in the hospital or clinic"
+    },
+    {
+      "name": "Staff",
+      "description": "This endpoint deals with staff related things"
     }
   ],
   "definitions": {
@@ -415,6 +502,38 @@
         }
       },
       "required": ["name", "description", "contact", "email", "location", "services"]
+    },
+    "Staff": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the staff member"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the staff member"
+        },
+        "role": {
+          "type": "string",
+          "description": "Role of the staff member",
+          "enum": ["doctor", "nurse", "receptionist", "admin"]
+        },
+        "departmentId": {
+          "type": "string",
+          "description": "ID of the department the staff member is associated with"
+        },
+        "email": {
+          "type": "string",
+          "description": "Email of the staff member",
+          "format": "email"
+        },
+        "phone": {
+          "type": "string",
+          "description": "Phone number of the staff member"
+        }
+      },
+      "required": ["id", "name", "role", "departmentId", "email", "phone"]
     }
   }
 }
