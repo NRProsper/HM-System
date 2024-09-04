@@ -9,12 +9,8 @@ import ErrorHandlerMiddleware from '../middlewares/ErrorHandler.js'
 import configurations from "../configs/index.js";
 
 
-// Cors policy configuration.
-const corsOptions = {
-    allowedHeaders: ["Authorization","Content-Type"],
-    methods: ["GET", "POST", "UPDATE" ],
-    origin: ["http://localhost:5500", configurations.CLIENT_APP],
-}
+
+
 
 export default function (app) {
     app.use(cors());

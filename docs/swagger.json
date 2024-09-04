@@ -5,7 +5,7 @@
     "description": "An API for managing CareSync",
     "version": "1.0.0"
   },
-  "host": "localhost:661",
+  "host": "https://hm-system-2wke.onrender.com",
   "basePath": "/api",
   "schemes": [
     "http",
