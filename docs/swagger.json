@@ -11,59 +11,73 @@
     "https"
   ],
   "paths": {
-    "/user/signup": {
+    "/auth/signup": {
       "post": {
         "summary": "User sign up registration",
-        "description": "Add a new user through sign up for the first time for subsequent logins.",
+        "description": "Register a new user with required details.",
         "tags": ["User"],
         "parameters": [
           {
             "in": "body",
             "name": "body",
+            "required": true,
+            "description": "User registration details",
             "schema": {
               "$ref": "#/definitions/signup"
-            },
-            "required": true,
-            "description": "User data"
+            }
           }
         ],
         "responses": {
-          "200": { "description": "Success" },
-          "400": { "description": "Invalid input" }
+          "201": {
+            "description": "User registered successfully"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "409": {
+            "description": "Email or phone number already in use"
+          }
         }
       }
     },
-    "/user/login": {
+    "/auth/login": {
       "post": {
         "summary": "User login",
-        "description": "User logs in with their credentials.",
+        "description": "Authenticate user and provide JWT token.",
         "tags": ["User"],
         "parameters": [
           {
             "in": "body",
             "name": "body",
+            "required": true,
+            "description": "User login credentials",
             "schema": {
               "$ref": "#/definitions/login"
-            },
-            "required": true,
-            "description": "Login credentials"
+            }
           }
         ],
         "responses": {
-          "200": { "description": "Success" },
-          "401": { "description": "Unauthorized" }
+          "200": {
+            "description": "User logged in successfully"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Invalid email or password"
+          }
         }
       }
     },
-    "/user/logout": {
+    "/auth/logout": {
       "get": {
         "summary": "User logout",
-        "description": "User logs out of their account in the health management system.",
+        "description": "Clear session and log out user.",
         "tags": ["User"],
         "responses": {
-          "200": { "description": "Successfully logged out." },
-          "404": { "description": "User not found" },
-          "500": { "description": "Internal server error" }
+          "200": {
+            "description": "Logout success"
+          }
         }
       }
     },
@@ -279,14 +293,26 @@
     "signup": {
       "type": "object",
       "properties": {
-        "username": {
+        "firstName": {
           "type": "string",
-          "description": "The name of the user"
+          "description": "The first name of the user"
+        },
+        "lastName": {
+          "type": "string",
+          "description": "The last name of the user"
         },
         "email": {
           "type": "string",
           "description": "The email of the user",
           "format": "email"
+        },
+        "phone": {
+          "type": "string",
+          "description": "The phone number of the user"
+        },
+        "description": {
+          "type": "string",
+          "description": "A brief description about the user"
         },
         "password": {
           "type": "string",
@@ -294,12 +320,15 @@
         },
         "role": {
           "type": "string",
-          "description": "Role of the user (e.g., doctor, nurse)",
-          "enum": ["doctor", "nurse", "receptionist", "admin"],
-          "default": "doctor"
+          "description": "Role of the user (e.g., doctor, nurse, receptionist, admin)",
+          "enum": ["doctor", "nurse", "receptionist", "admin"]
+        },
+        "departmentId": {
+          "type": "string",
+          "description": "The ID of the department the user is associated with"
         }
       },
-      "required": ["username", "email", "password"]
+      "required": ["firstName", "lastName", "email", "phone", "password", "role"]
     },
     "login": {
       "type": "object",
