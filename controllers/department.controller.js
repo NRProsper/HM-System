@@ -2,6 +2,19 @@ import departmentModel from '../models/department.model.js';
 import asyncWrapper from "../middlewares/async.js";
 import { BadRequestError } from "../errors/BadRequestError.js";
 import { validationResult } from "express-validator";
+import DepartmentModel from "../models/department.model.js";
+
+export const getAllDepartments = asyncWrapper(
+    async (req, res) => {
+        const departments = await DepartmentModel.find();
+        return res.status(200).json(
+            {
+                departments: departments,
+                message: "Departments retrieved successfully"
+            }
+        );
+    }
+)
 
 // Create a new department
 export const createDepartment = asyncWrapper(async (req, res, next) => {
@@ -10,7 +23,7 @@ export const createDepartment = asyncWrapper(async (req, res, next) => {
         throw new BadRequestError(errors.array());
     }
 
-    const { name, description, contact, email, location, largeDescription, services, isActive } = req.body;
+    const { name, description, contact, email, location, largeDescription, services } = req.body;
 
     // Check if the department already exists
     const existingDepartment = await departmentModel.findOne({ name });
@@ -19,15 +32,14 @@ export const createDepartment = asyncWrapper(async (req, res, next) => {
     }
 
     // Create and save the new department
-    const department = new departmentModel({
+    const department = new DepartmentModel({
         name,
         description,
         contact,
         email,
         location,
         largeDescription,
-        services,
-        isActive
+        services
     });
 
     await department.save();
@@ -90,9 +102,4 @@ export const deleteDepartment = asyncWrapper(async (req, res, next) => {
     }
 
     res.status(200).json({ message: 'Department deleted successfully' });
-});
-export const listDepartments = asyncWrapper(async (req, res, next) => {
-
-    const department = await departmentModel.find({}, 'name');
-    res.status(200).json({message:"A list of all department is retrieved successfully" ,department});
 });
