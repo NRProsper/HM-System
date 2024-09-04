@@ -17,8 +17,11 @@ export default function (app) {
     app.use(express.json());
 
     app.get("/", (req, res) => {
-        res.send("Welcome to health management API v.1.0.0");
-    })
+        res.send(`
+        <h1>Welcome to Health Management API v.1.0.0</h1>
+        <p>To preview the API documentation, <a href="/api-documentation">click here</a>.</p>
+    `);
+    });
 
     app.use('/api', routes);
     app.use(cookieParser());
