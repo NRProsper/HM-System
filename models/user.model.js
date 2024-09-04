@@ -3,23 +3,41 @@ import bcrypt from "bcryptjs";
 
 
 const userchema = new mongoose.Schema({
-  username: {
+  firstName: {
     type: String,
-    required: true,
+    required: [true, "First name is required"]
+  },
+  lastName: {
+    type: String,
+    required: [true, "Last name is required"]
   },
   email: {
     type: String,
-    required: true,
+    required: [true, "Email must be provided"],
     unique: true
   },
+  phone: {
+    type: String,
+    unique: true,
+    required: [true, "Phone number must be provided"]
+  },
+  description: String,
   password: {
     type: String,
     required: true,
   },
-  role: {
+  role:{
     type: String,
-    enum: ["doctor", "nurse" ,"receptionist","admin"],
-    default: "doctor"
+    enum: {
+      values: ['Admin', 'Doctor', 'Nurse', 'Receptionist'],
+      message: '${VALUE} is not supported'
+    },
+    default: 'Doctor'
+  },
+  departmentId: {
+    type: mongoose.Schema.ObjectId,
+    ref: 'Department',
+    required: [true, 'Department is required']
   },
 }, {
     timestamps: true,
