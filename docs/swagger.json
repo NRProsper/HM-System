@@ -5,7 +5,7 @@
     "description": "An API for managing CareSync",
     "version": "1.0.0"
   },
-  "host": "https://hm-system-2wke.onrender.com",
+  "host": "hm-system-923x.onrender.com",
   "basePath": "/api",
   "schemes": [
     "http",
@@ -130,28 +130,7 @@
         }
       }
     },
-    "/department/add": {
-      "post": {
-        "summary": "The admin adds a department in the database",
-        "description": "The administrator adds a new department in the database for appointments in the hospital or clinic.",
-        "tags": ["Department"],
-        "parameters": [
-          {
-            "in": "body",
-            "name": "body",
-            "schema": {
-              "$ref": "#/definitions/department"
-            },
-            "required": true,
-            "description": "Enter department details here"
-          }
-        ],
-        "responses": {
-          "200": { "description": "Success" }
-        }
-      }
-    },
-    "/department/NameOfAllDepartment": {
+    "/departments": {
       "get": {
         "summary": "List of names of all departments",
         "description": "Retrieve the list of names of all departments from the database.",
