@@ -1,4 +1,4 @@
-import CustomError from "./customError.js";
+import CustomError from "./CustomError.js";
 
 /**
  * Custom error class for handling bad request errors.
