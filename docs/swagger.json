@@ -356,7 +356,84 @@
           }
         }
       }
+    },
+    "/appointments": {
+      "get": {
+        "summary": "List of all appointments",
+        "description": "Retrieve the list of all appointments from the database, with optional filtering by status.",
+        "tags": ["Appointment"],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number for pagination",
+            "required": false,
+            "schema": { "type": "integer", "example": 1 }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Number of appointments per page",
+            "required": false,
+            "schema": { "type": "integer", "example": 10 }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Field to sort by (e.g., 'visitDate')",
+            "required": false,
+            "schema": { "type": "string", "example": "-visitDate" }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Filter appointments by status ('PENDING', 'REJECTED', 'ACCEPTED')",
+            "required": false,
+            "schema": { "type": "string", "enum": ["PENDING", "REJECTED", "ACCEPTED"] }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved a list of all appointments",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Appointment"
+              }
+            }
+          },
+          "404": { "description": "Appointments not found" },
+          "500": { "description": "Internal server error" }
+        }
+      },
+      "post": {
+        "summary": "Create a new appointment",
+        "description": "This route is used to create a new appointment in the clinic.",
+        "tags": ["Appointment"],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Appointment"
+            },
+            "description": "Appointment data to be created"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Appointment created successfully",
+            "schema": {
+              "$ref": "#/definitions/Appointment"
+            }
+          },
+          "400": { "description": "Invalid input data" },
+          "500": { "description": "Internal server error" }
+        }
+      }
     }
+
   },
   "tags": [
     {
@@ -374,6 +451,10 @@
     {
       "name": "Staff",
       "description": "This endpoint deals with staff related things"
+    },
+    {
+      "name": "Appointment",
+      "description": "Deals with all operations related to appointments"
     }
   ],
   "definitions": {
@@ -534,6 +615,58 @@
         }
       },
       "required": ["id", "name", "role", "departmentId", "email", "phone"]
+    },
+    "Appointment": {
+      "type": "object",
+      "required": [
+        "patientName",
+        "departmentId",
+        "doctorId",
+        "visitDate",
+        "email",
+        "phone",
+        "time"
+      ],
+      "properties": {
+        "patientName": {
+          "type": "string",
+          "example": "John Doe"
+        },
+        "departmentId": {
+          "type": "string",
+          "description": "ID of the department"
+        },
+        "doctorId": {
+          "type": "string",
+          "description": "ID of the doctor"
+        },
+        "visitDate": {
+          "type": "string",
+          "format": "date",
+          "example": "2024-09-01T10:30:00Z"
+        },
+        "email": {
+          "type": "string",
+          "example": "john.doe@example.com"
+        },
+        "phone": {
+          "type": "string",
+          "example": "+123456789"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["PENDING", "REJECTED", "ACCEPTED"],
+          "example": "PENDING"
+        },
+        "time": {
+          "type": "string",
+          "example": "14:00"
+        },
+        "comments": {
+          "type": "string",
+          "example": "Patient has allergies to penicillin."
+        }
+      }
     }
   }
 }
