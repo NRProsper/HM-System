@@ -2,7 +2,6 @@ import asyncWrapper from "../middlewares/async.js";
 import AppointmentModel from "../models/appointment.model.js";
 import {validateAppointment} from "../utils/validation.js";
 import {validateRequest} from "../middlewares/validate.js";
-import CircularJSON from 'circular-json';
 
 export const createAppointment = asyncWrapper([
     validateAppointment,
