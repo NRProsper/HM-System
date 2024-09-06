@@ -2,6 +2,7 @@ import asyncWrapper from "../middlewares/async.js";
 import AppointmentModel from "../models/appointment.model.js";
 import {validateAppointment} from "../utils/validation.js";
 import {validateRequest} from "../middlewares/validate.js";
+import CircularJSON from 'circular-json';
 
 export const createAppointment = asyncWrapper([
     validateAppointment,
@@ -44,19 +45,20 @@ export const getAllAppointments = asyncWrapper(async (req, res) => {
     const appointments = await AppointmentModel.find(filter)
         .populate('departmentId')
         .populate('doctorId')
-        .sort(sort)              // Sort by query parameter, e.g., '-visitDate' for descending
-        .skip(skip)              // Skip the previous pages
-        .limit(limitNumber);     // Limit results per page
+        .sort(sort)
+        .skip(skip)
+        .limit(limitNumber)
+        .lean();
 
-    const totalAppointments = AppointmentModel.countDocuments();
+    const totalAppointments = await AppointmentModel.countDocuments(filter);
 
-    res.status(200).json({
+    res.status(200).send({
         message: "Appointments fetched successfully",
-        total: totalAppointments,                // Total count of documents
-        page: pageNumber,                        // Current page
-        limit: limitNumber,                      // Limit per page
-        totalPages: Math.ceil(totalAppointments / limitNumber), // Total pages
-        appointments                            // List of appointments
+        total: totalAppointments,
+        page: pageNumber,
+        limit: limitNumber,
+        totalPages: Math.ceil(totalAppointments / limitNumber),
+        appointments
     });
 
 })
