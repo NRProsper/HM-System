@@ -38,7 +38,7 @@ const departmentSchema = new mongoose.Schema({
     }
 }, { timestamps: true });  // Automatically adds createdAt and updatedAt fields
 
-const departmentModel=mongoose.model("department", departmentSchema);
+const departmentModel=mongoose.model("Department", departmentSchema);
 
 
 export default departmentModel;
