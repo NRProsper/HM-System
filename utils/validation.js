@@ -1,6 +1,6 @@
-import { body, validationResult } from 'express-validator'
+import { body } from 'express-validator'
 
-export const logInValidations = [
+export const validateLogin = [
     body("email", "Email is required").not().isEmpty(),
     body("email", "Invalid email").isEmail(),
     body("password", "Password is required").not().isEmpty(),
