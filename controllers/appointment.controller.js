@@ -9,8 +9,8 @@ export const createAppointment = [
     asyncWrapper(async (req, res) => {
         const newAppointment = new AppointmentModel({
             patientName: req.body.patientName,
-            departmentId: req.body.departmentId,
-            doctorId: req.body.doctorId,
+            department: req.body.department,
+            doctor: req.body.doctor,
             visitDate: req.body.visitDate,
             email: req.body.email,
             phone: req.body.phone,
@@ -42,8 +42,11 @@ export const getAllAppointments = asyncWrapper(async (req, res) => {
     const skip = (pageNumber - 1) * limitNumber;
 
     const appointments = await AppointmentModel.find(filter)
-        .populate('departmentId')
-        .populate('doctorId')
+        .populate('department')
+        .populate({
+            path: 'doctor',
+            select: '-password'
+        })
         .sort(sort)
         .skip(skip)
         .limit(limitNumber)
