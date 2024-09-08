@@ -5,12 +5,12 @@ const appointmentSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    departmentId: {
+    department: {
         type: mongoose.Schema.ObjectId,
         ref: 'Department',
         required: true
     },
-    doctorId: {
+    doctor: {
         type: mongoose.Schema.ObjectId,
         ref: 'Staff',
         required: true
