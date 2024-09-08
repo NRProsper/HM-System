@@ -10,7 +10,7 @@ import {validateRequest} from "../middlewares/validate.js";
 export const createUser = asyncWrapper(async (req, res, next) => {
 
 
-    const { firstName, lastName, email, phone, description, password, role, departmentId } = req.body;
+    const { firstName, lastName, email, phone, description, password, role, department } = req.body;
 
     // Check if the email already exists
     const existingUser = await userModel.findOne({ $or: [{ email }, { phone }] });
@@ -27,7 +27,7 @@ export const createUser = asyncWrapper(async (req, res, next) => {
         description,
         password,
         role,
-        departmentId,
+        department,
     });
 
     await newUser.save();

@@ -38,11 +38,11 @@ export const validateAppointment = [
         .notEmpty().withMessage('Patient name is required')
         .isString().withMessage('Patient name must be a string'),
 
-    body('departmentId')
+    body('department')
         .notEmpty().withMessage('Department ID is required')
         .isMongoId().withMessage('Department ID must be a valid Mongo ID'),
 
-    body('doctorId')
+    body('doctor')
         .notEmpty().withMessage('Doctor ID is required')
         .isMongoId().withMessage('Doctor ID must be a valid Mongo ID'),
 
