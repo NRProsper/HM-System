@@ -73,7 +73,7 @@ export const createUser = [
                 lastName: newUser.lastName,
                 phone: newUser.phone,
                 description: newUser.description,
-                departmentId: newUser.departmentId
+                department: newUser.department
             },
         });
 
@@ -88,7 +88,7 @@ export const createUser = [
           const { email, password } = req.body;
 
           // Find user
-          const foundUser = await UserModel.findOne({ email }).populate('departmentId');
+          const foundUser = await UserModel.findOne({ email }).populate('department');
           if (!foundUser) {
               return next(new BadRequestError("User not found!"));
           }
@@ -112,8 +112,8 @@ export const createUser = [
                   firstName: foundUser.firstName,
                   lastName: foundUser.lastName,
                   phone: foundUser.phone,
-                  departmentId: foundUser.departmentId ? foundUser.departmentId._id : null,
-                  departmentName: foundUser.departmentId ? foundUser.departmentId.name : null
+                  departmentId: foundUser.department ? foundUser.department._id : null,
+                  departmentName: foundUser.department ? foundUser.department.name : null
               },
               process.env.JWT_SECRET_KEY,
               { expiresIn: "1h" }
@@ -129,8 +129,8 @@ export const createUser = [
                   firstName: foundUser.firstName,
                   lastName: foundUser.lastName,
                   phone: foundUser.phone,
-                  departmentId: foundUser.departmentId ? foundUser.departmentId._id : null,
-                  departmentName: foundUser.departmentId ? foundUser.departmentId.name : null
+                  departmentId: foundUser.department ? foundUser.department._id : null,
+                  departmentName: foundUser.department ? foundUser.department.name : null
               }
           });
       })
