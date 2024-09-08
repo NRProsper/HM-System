@@ -1,8 +1,9 @@
 import asyncWrapper from "../middlewares/async.js";
 import UserModel from "../models/user.model.js";
+import AppointmentModel from "../models/appointment.model.js";
 
 export const getAllStaff = asyncWrapper(async (req, res, next) => {
-    const {role, department} = req.query;
+    const {page = 1, limit = 10, role, department} = req.query;
 
     const filter = {};
     if (role) {
@@ -12,18 +13,30 @@ export const getAllStaff = asyncWrapper(async (req, res, next) => {
         filter.department = department;
     }
 
+    const pageNumber = parseInt(page, 10);
+    const limitNumber = parseInt(limit, 10);
+    const skip = (pageNumber - 1) * limitNumber;
+
     const staff = await UserModel.find(filter)
         .populate('department')
-        .select('-password'); // Exclude the password field
+        .select('-password')
+        .skip(skip)
+        .limit(limitNumber)
+        .lean();
 
     if (staff.length === 0) {
         return res.status(404).json({
             message: "No staff members found for the provided filters."
         });
     }
+    const totalStaff = await UserModel.countDocuments(filter);
 
     res.status(200).json({
         message: "Staff members retrieved successfully",
+        total: totalStaff,
+        page: pageNumber,
+        limit: limitNumber,
+        totalPages: Math.ceil(totalStaff / limitNumber),
         staff
     });
 
