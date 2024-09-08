@@ -4,16 +4,42 @@ export const validateLogin = [
     body("email", "Email is required").not().isEmpty(),
     body("email", "Invalid email").isEmail(),
     body("password", "Password is required").not().isEmpty(),
-    body("password", "Invalid password").isStrongPassword()
 ];
 
-export const signUpValidations = [
 
-    body("username", "User name  is required").not().isEmpty(),
-    body("email", "Email is required").not().isEmpty(),
-    body("email", "Invalid email").isEmail(),
-    body("password", "Password is required").not().isEmpty(),
-    body("password", "Password should contain atleast 8 characters, uppercase and lower case letters, numbers, and symbols").isStrongPassword()
+export const validateUser = [
+    body('firstName')
+        .notEmpty().withMessage('First name is required')
+        .isString().withMessage('First name must be a string'),
+
+    body('lastName')
+        .notEmpty().withMessage('Last name is required')
+        .isString().withMessage('Last name must be a string'),
+
+    body('email')
+        .notEmpty().withMessage('Email must be provided')
+        .isEmail().withMessage('Must be a valid email')
+        .normalizeEmail(),
+
+    body('phone')
+        .notEmpty().withMessage('Phone number must be provided')
+        .isMobilePhone().withMessage('Phone number must be valid'),
+
+    body('description')
+        .optional()
+        .isString().withMessage('Description must be a string'),
+
+    body('password')
+        .notEmpty().withMessage('Password is required')
+        .isLength({ min: 6 }).withMessage('Password must be at least 6 characters long'),
+
+    body('role')
+        .optional()
+        .isIn(['Admin', 'Doctor', 'Nurse', 'Receptionist']).withMessage('Role must be one of Admin, Doctor, Nurse, or Receptionist'),
+
+    body('department')
+        .notEmpty().withMessage('Department is required')
+        .isMongoId().withMessage('Department must be a valid MongoDB ObjectId'),
 ];
 
 export const contactValidationRules = [
@@ -22,14 +48,14 @@ export const contactValidationRules = [
     body('message').notEmpty().withMessage('Message is required')
 ];
 
-export const departmentValidationRules = [
+export const validateDepartment = [
     body('name').notEmpty().withMessage('Name is required'),
     body('description').notEmpty().withMessage('Description is required'),
     body('contact').notEmpty().withMessage('Contact number is required'),
     body('email').notEmpty().withMessage('Email is required'),
     body('location').notEmpty().withMessage('Location is required'),
     body('largeDescription').optional().isString().withMessage('Large description must be a string'),
-    body('services').optional().isArray().withMessage('Services must be an array'),
+    body('services').notEmpty().isArray().withMessage('Services must be an array'),
     body('isActive').optional().isBoolean().withMessage('isActive must be a boolean'),
 ];
 

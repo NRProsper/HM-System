@@ -25,10 +25,9 @@ export const getAllStaff = asyncWrapper(async (req, res, next) => {
         .lean();
 
     if (staff.length === 0) {
-        return res.status(404).json({
-            message: "No staff members found for the provided filters."
-        });
+        return res.status(200).json({ message: 'No staff found', data: [] });
     }
+
     const totalStaff = await UserModel.countDocuments(filter);
 
     res.status(200).json({
@@ -69,3 +68,25 @@ export const getStaffById = asyncWrapper(async (req, res, next) => {
         staff
     });
 });
+
+export const deleteStaff = asyncWrapper(async (req, res, next) => {
+    const {id} = req.params;
+
+    if (!id) {
+        return res.status(400).json({
+            message: "Staff ID is required."
+        });
+    }
+
+    const staff = await UserModel.findByIdAndDelete(id)
+        .populate('department')
+        .select('-password');
+
+    if (!staff) {
+        return res.status(404).json({
+            message: "Staff member not found."
+        });
+    }
+
+    res.status(204).json({message: "User deleted successfully"});
+})
