@@ -34,7 +34,7 @@ const userchema = new mongoose.Schema({
     },
     default: 'Doctor'
   },
-  departmentId: {
+  department: {
     type: mongoose.Schema.ObjectId,
     ref: 'Department',
     required: [true, 'Department is required']
