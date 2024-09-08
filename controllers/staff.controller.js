@@ -42,7 +42,7 @@ export const getStaffById = asyncWrapper(async (req, res, next) => {
     }
 
     const staff = await UserModel.findById(id)
-        .populate('departmentId')
+        .populate('department')
         .select('-password');
 
     if (!staff) {
