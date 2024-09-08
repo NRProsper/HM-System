@@ -2,18 +2,18 @@ import asyncWrapper from "../middlewares/async.js";
 import UserModel from "../models/user.model.js";
 
 export const getAllStaff = asyncWrapper(async (req, res, next) => {
-    const {role, departmentId} = req.query;
+    const {role, department} = req.query;
 
     const filter = {};
     if (role) {
         filter.role = role;
     }
-    if (departmentId) {
-        filter.departmentId = departmentId;
+    if (department) {
+        filter.department = department;
     }
 
     const staff = await UserModel.find(filter)
-        .populate('departmentId')
+        .populate('department')
         .select('-password'); // Exclude the password field
 
     if (staff.length === 0) {

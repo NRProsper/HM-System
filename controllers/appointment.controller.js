@@ -3,10 +3,10 @@ import AppointmentModel from "../models/appointment.model.js";
 import {validateAppointment} from "../utils/validation.js";
 import {validateRequest} from "../middlewares/validate.js";
 
-export const createAppointment = asyncWrapper([
+export const createAppointment = [
     validateAppointment,
     validateRequest,
-    async (req, res) => {
+    asyncWrapper(async (req, res) => {
         const newAppointment = new AppointmentModel({
             patientName: req.body.patientName,
             departmentId: req.body.departmentId,
@@ -16,15 +16,15 @@ export const createAppointment = asyncWrapper([
             phone: req.body.phone,
             time: req.body.time,
             comments: req.body.comments,
-        })
+        });
 
         const createdAppointment = await newAppointment.save();
         res.status(201).json({
             message: "Appointment created successfully",
-            appointment: (await createdAppointment.populate("departmentId")).populate("doctorId")
-        })
-    }
-])
+            appointment: (await createdAppointment.populate("department")).populate("doctor")
+        });
+    })
+];
 
 
 export const getAllAppointments = asyncWrapper(async (req, res) => {
