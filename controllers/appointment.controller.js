@@ -151,9 +151,46 @@ export const approveAppointment = asyncWrapper(async (req, res) => {
 export const rejectAppointment = asyncWrapper(async (req, res) => {
     const { appointmentId } = req.params;
     const { comment } = req.body;
+
     const updatedAppointment = await AppointmentModel.rejectAppointment(appointmentId);
+    if (!updatedAppointment) {
+        return res.status(404).json({ message: 'Appointment not found' });
+    }
+
+
+    const appointment = await AppointmentModel.findById(appointmentId)
+        .populate("department")
+        .populate("doctor");
+
+    const htmlContent = `
+      <html>
+        <body style="font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4;">
+          <table width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width: 600px; margin: auto; background-color: #ffffff; border-radius: 8px; overflow: hidden;">
+            <tr>
+              <td style="padding: 20px;">
+                <h1 style="font-size: 24px; color: #333333; margin-top: 0;">Dear ${updatedAppointment.patientName},</h1>
+                <p style="font-size: 16px; color: #666666;">Your appointment has been <strong>rejected</strong>.</p>
+                <p style="font-size: 16px; color: #666666;">Appointment Details:</p>
+                <ul style="font-size: 16px; color: #333333;">
+                  <li><strong>Department:</strong> ${appointment.department.name}</li>
+                  <li><strong>Doctor:</strong> ${appointment.doctor.firstName} ${appointment.doctor.lastName}</li>
+                  <li><strong>Date:</strong> ${updatedAppointment.visitDate}</li>
+                  <li><strong>Time:</strong> ${updatedAppointment.time}</li>
+                  <li><strong>Comments from Doctor:</strong> ${comment ? comment : "No comments provided by the Doctor"}</li>
+                </ul>
+                <p style="font-size: 16px; color: #666666; margin-bottom: 0;">Best regards,<br>Care Sync Team</p>
+              </td>
+            </tr>
+          </table>
+        </body>
+      </html>
+    `;
+
+    // Send the rejection email
+    sendEmail(updatedAppointment.email, "Appointment Rejected", htmlContent);
+
     res.status(200).json({
         message: 'Appointment rejected',
         appointment: updatedAppointment
     });
-})
+});
