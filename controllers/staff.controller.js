@@ -1,6 +1,5 @@
 import asyncWrapper from "../middlewares/async.js";
 import UserModel from "../models/user.model.js";
-import AppointmentModel from "../models/appointment.model.js";
 
 export const getAllStaff = asyncWrapper(async (req, res, next) => {
     const {page = 1, limit = 10, role, department} = req.query;
@@ -23,7 +22,7 @@ export const getAllStaff = asyncWrapper(async (req, res, next) => {
         .skip(skip)
         .limit(limitNumber)
         .lean();
-    
+
 
     const totalStaff = await UserModel.countDocuments(filter);
 
