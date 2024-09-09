@@ -1,6 +1,5 @@
 import asyncWrapper from "../middlewares/async.js";
 import UserModel from "../models/user.model.js";
-import AppointmentModel from "../models/appointment.model.js";
 
 export const getAllStaff = asyncWrapper(async (req, res, next) => {
     const {page = 1, limit = 10, role, department} = req.query;
@@ -24,9 +23,6 @@ export const getAllStaff = asyncWrapper(async (req, res, next) => {
         .limit(limitNumber)
         .lean();
 
-    if (staff.length === 0) {
-        return res.status(200).json({ message: 'No staff found', data: [] });
-    }
 
     const totalStaff = await UserModel.countDocuments(filter);
 
