@@ -4,35 +4,37 @@ import jwt from "jsonwebtoken";
 import asyncWrapper from "../middlewares/async.js";
 import {BadRequestError} from "../errors/BadRequestError.js";
 import bcrypt from "bcryptjs";
-import {validateLogin} from "../utils/validation.js";
+import {validateLogin, validateUser} from "../utils/validation.js";
 import {validateRequest} from "../middlewares/validate.js";
 
-export const createUser = asyncWrapper(async (req, res, next) => {
+export const createUser = [
+    validateUser,
+    validateRequest,
+    asyncWrapper(async (req, res, next) => {
 
+        const { firstName, lastName, email, phone, description, password, role, department } = req.body;
 
-    const { firstName, lastName, email, phone, description, password, role, department } = req.body;
+        // Check if the email already exists
+        const existingUser = await userModel.findOne({ $or: [{ email }, { phone }] });
+        if (existingUser) {
+            return next(new BadRequestError("Email or phone number already in use!"));
+        }
 
-    // Check if the email already exists
-    const existingUser = await userModel.findOne({ $or: [{ email }, { phone }] });
-    if (existingUser) {
-        return next(new BadRequestError("Email or phone number already in use!"));
-    }
+        // Create new user
+        const newUser = new UserModel({
+            firstName,
+            lastName,
+            email,
+            phone,
+            description,
+            password,
+            role,
+            department,
+        });
 
-    // Create new user
-    const newUser = new UserModel({
-        firstName,
-        lastName,
-        email,
-        phone,
-        description,
-        password,
-        role,
-        department,
-    });
+        await newUser.save();
 
-    await newUser.save();
-
-    const htmlContent = `
+        const htmlContent = `
         <html>
         <body style="font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4;">
             <table width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width: 600px; margin: auto; background-color: #ffffff; border-radius: 8px; overflow: hidden;">
@@ -59,23 +61,24 @@ export const createUser = asyncWrapper(async (req, res, next) => {
         </html>
     `;
 
-    // sendEmail(newUser.role, "Your Account is created", htmlContent);
+        // sendEmail(newUser.role, "Your Account is created", htmlContent);
 
-    res.status(201).json({
-        message: "User registered successfully!",
-        user: {
-            id: newUser.id,
-            email: newUser.email,
-            role: newUser.role,
-            firstName: newUser.firstName,
-            lastName: newUser.lastName,
-            phone: newUser.phone,
-            description: newUser.description,
-            departmentId: newUser.departmentId
-        },
-    });
+        res.status(201).json({
+            message: "User registered successfully!",
+            user: {
+                id: newUser.id,
+                email: newUser.email,
+                role: newUser.role,
+                firstName: newUser.firstName,
+                lastName: newUser.lastName,
+                phone: newUser.phone,
+                description: newUser.description,
+                department: newUser.department
+            },
+        });
 
-  });
+    })
+];
 
   export const logIn = [
       validateLogin,
@@ -85,7 +88,7 @@ export const createUser = asyncWrapper(async (req, res, next) => {
           const { email, password } = req.body;
 
           // Find user
-          const foundUser = await UserModel.findOne({ email }).populate('departmentId');
+          const foundUser = await UserModel.findOne({ email }).populate('department');
           if (!foundUser) {
               return next(new BadRequestError("User not found!"));
           }
@@ -109,8 +112,8 @@ export const createUser = asyncWrapper(async (req, res, next) => {
                   firstName: foundUser.firstName,
                   lastName: foundUser.lastName,
                   phone: foundUser.phone,
-                  departmentId: foundUser.departmentId ? foundUser.departmentId._id : null,
-                  departmentName: foundUser.departmentId ? foundUser.departmentId.name : null
+                  departmentId: foundUser.department ? foundUser.department._id : null,
+                  departmentName: foundUser.department ? foundUser.department.name : null
               },
               process.env.JWT_SECRET_KEY,
               { expiresIn: "1h" }
@@ -126,8 +129,8 @@ export const createUser = asyncWrapper(async (req, res, next) => {
                   firstName: foundUser.firstName,
                   lastName: foundUser.lastName,
                   phone: foundUser.phone,
-                  departmentId: foundUser.departmentId ? foundUser.departmentId._id : null,
-                  departmentName: foundUser.departmentId ? foundUser.departmentId.name : null
+                  departmentId: foundUser.department ? foundUser.department._id : null,
+                  departmentName: foundUser.department ? foundUser.department.name : null
               }
           });
       })

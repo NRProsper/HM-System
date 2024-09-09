@@ -64,3 +64,11 @@ export const getAllAppointments = asyncWrapper(async (req, res) => {
     });
 
 })
+
+export const approveAppointment = asyncWrapper(
+    async (req, res) => {
+        const appointmentId = req.params;
+        const updatedAppointment = await AppointmentModel.approveAppointment(appointmentId);
+        res.status(200).json({ message: 'Appointment approved', data: updatedAppointment });
+    }
+)

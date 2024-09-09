@@ -41,6 +41,20 @@ const appointmentSchema = new mongoose.Schema({
     comments: String
 })
 
+appointmentSchema.statics.approveAppointment = async function (appointmentId) {
+    const appointment = await this.findById(appointmentId);
+    if (!appointment) {
+        throw new Error('Appointment not found');
+    }
+
+    if (appointment.status !== 'PENDING') {
+        throw new Error('Appointment cannot be approved because it is not in PENDING status');
+    }
+
+    appointment.status = 'ACCEPTED';
+    return appointment.save();
+}
+
 
 export default mongoose.model("Appointment", appointmentSchema);
 
