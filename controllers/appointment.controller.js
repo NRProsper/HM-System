@@ -112,7 +112,7 @@ export const approveAppointment = asyncWrapper(async (req, res) => {
     const { appointmentId } = req.params;
     const { comment } = req.body;
     const updatedAppointment = await AppointmentModel.approveAppointment(appointmentId);
-    const populatedAppointment = await updatedAppointment.populate("department").populate("doctor")
+    const appointment = await AppointmentModel.findById(appointmentId).populate("department").populate("doctor")
 
     const htmlContent = `
       <html>
@@ -124,8 +124,8 @@ export const approveAppointment = asyncWrapper(async (req, res) => {
                 <p style="font-size: 16px; color: #666666;">Your appointment has been <strong>approved</strong>.</p>
                 <p style="font-size: 16px; color: #666666;">Appointment Details:</p>
                 <ul style="font-size: 16px; color: #333333;">
-                  <li><strong>Department:</strong> ${populatedAppointment.department.name}</li>
-                  <li><strong>Doctor:</strong> ${populatedAppointment.doctor.firstName} ${populatedAppointment.doctor.lastName}</li>
+                  <li><strong>Department:</strong> ${updatedAppointment.department.name}</li>
+                  <li><strong>Doctor:</strong> ${appointment.doctor.firstName} ${appointment.doctor.lastName}</li>
                   <li><strong>Date:</strong> ${updatedAppointment.visitDate}</li>
                   <li><strong>Time:</strong> ${updatedAppointment.time}</li>
                   <li><strong>Comments from Doctor:</strong> ${comment ? comment : "No comments provided by the Doctor"}</li>
