@@ -88,7 +88,7 @@ export const validateAppointment = [
         .notEmpty().withMessage('Time is required')
         .matches(/^\d{2}:\d{2}$/).withMessage('Time must be in HH:mm format'),
 
-    body('comments')
+    body('comment')
         .optional()
         .isString().withMessage('Comments must be a string')
 ];

@@ -2,26 +2,63 @@ import asyncWrapper from "../middlewares/async.js";
 import AppointmentModel from "../models/appointment.model.js";
 import {validateAppointment} from "../utils/validation.js";
 import {validateRequest} from "../middlewares/validate.js";
+import {sendEmail} from "../utils/sendEmail.js";
+import UserModel from "../models/user.model.js";
+import DepartmentModel from "../models/department.model.js";
 
 export const createAppointment = [
     validateAppointment,
     validateRequest,
     asyncWrapper(async (req, res) => {
+        const { patientName, department, doctor, visitDate, email, phone, time, comment } = req.body;
+
         const newAppointment = new AppointmentModel({
-            patientName: req.body.patientName,
-            department: req.body.department,
-            doctor: req.body.doctor,
-            visitDate: req.body.visitDate,
-            email: req.body.email,
-            phone: req.body.phone,
-            time: req.body.time,
-            comments: req.body.comments,
+            patientName,
+            department,
+            doctor,
+            visitDate,
+            email,
+            phone,
+            time,
+            comment
         });
 
         const createdAppointment = await newAppointment.save();
+
+        const rDoctor = await UserModel.findById(doctor);
+        const rDepartment = await DepartmentModel.findById(department);
+
+        const htmlContent = `
+          <html>
+            <body style="font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4;">
+              <table width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width: 600px; margin: auto; background-color: #ffffff; border-radius: 8px; overflow: hidden;">
+                <tr>
+                  <td style="padding: 20px;">
+                    <h1 style="font-size: 24px; color: #333333; margin-top: 0;">Dear ${patientName},</h1>
+                    <p style="font-size: 16px; color: #666666;">Your appointment has been booked successfully.</p>
+                    <p style="font-size: 16px; color: #666666;">We will notify you once your appointment is approved.</p>
+                    <p style="font-size: 16px; color: #666666;">Appointment Details:</p>
+                    <ul style="font-size: 16px; color: #333333;">
+                      <li><strong>Department:</strong> ${rDepartment.name}</li>
+                      <li><strong>Doctor:</strong> ${rDoctor.firstName + " " + rDoctor.lastName}</li>
+                      <li><strong>Date:</strong> ${visitDate}</li>
+                      <li><strong>Time:</strong> ${time}</li>
+                      <li><strong>Comments:</strong> ${comment}</li>
+                    </ul>
+                    <p style="font-size: 16px; color: #666666; margin-bottom: 0;">Best regards,<br>Care Sync</p>
+                  </td>
+                </tr>
+              </table>
+            </body>
+          </html>
+        `;
+
+        sendEmail(email, "Appointment Booked", htmlContent);
+
+
         res.status(201).json({
             message: "Appointment created successfully",
-            appointment: (await createdAppointment.populate("department")).populate("doctor")
+            appointment: createdAppointment
         });
     })
 ];
@@ -29,10 +66,16 @@ export const createAppointment = [
 
 export const getAllAppointments = asyncWrapper(async (req, res) => {
     const { page = 1, limit = 10, sort = '-visitDate', status } = req.query;
+    const userRole = req.user.role;
+    const userId = req.user.id;
 
     const filter = {}
     if (status) {
         filter.status = status;
+    }
+
+    if (userRole === 'Doctor') {
+        filter.doctor = userId;
     }
 
     const pageNumber = parseInt(page, 10);
@@ -65,10 +108,52 @@ export const getAllAppointments = asyncWrapper(async (req, res) => {
 
 })
 
-export const approveAppointment = asyncWrapper(
-    async (req, res) => {
-        const appointmentId = req.params;
-        const updatedAppointment = await AppointmentModel.approveAppointment(appointmentId);
-        res.status(200).json({ message: 'Appointment approved', data: updatedAppointment });
+export const approveAppointment = asyncWrapper(async (req, res) => {
+    const { appointmentId } = req.params;
+    const { comment } = req.body;
+    const updatedAppointment = await AppointmentModel.approveAppointment(appointmentId);
+    const populatedAppointment = await updatedAppointment.populate("department").populate("doctor")
+
+    const htmlContent = `
+      <html>
+        <body style="font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4;">
+          <table width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width: 600px; margin: auto; background-color: #ffffff; border-radius: 8px; overflow: hidden;">
+            <tr>
+              <td style="padding: 20px;">
+                <h1 style="font-size: 24px; color: #333333; margin-top: 0;">Dear ${updatedAppointment.patientName},</h1>
+                <p style="font-size: 16px; color: #666666;">Your appointment has been <strong>approved</strong>.</p>
+                <p style="font-size: 16px; color: #666666;">Appointment Details:</p>
+                <ul style="font-size: 16px; color: #333333;">
+                  <li><strong>Department:</strong> ${populatedAppointment.department.name}</li>
+                  <li><strong>Doctor:</strong> ${populatedAppointment.doctor.firstName} ${populatedAppointment.doctor.lastName}</li>
+                  <li><strong>Date:</strong> ${updatedAppointment.visitDate}</li>
+                  <li><strong>Time:</strong> ${updatedAppointment.time}</li>
+                  <li><strong>Comments from Doctor:</strong> ${comment ? comment : "No comments provided by the Doctor"}</li>
+                </ul>
+                <p style="font-size: 16px; color: #666666; margin-bottom: 0;">Best regards,<br>Care Sync Team</p>
+              </td>
+            </tr>
+          </table>
+        </body>
+      </html>
+    `;
+
+    sendEmail(updatedAppointment.email, "Appointment Accepted",htmlContent)
+
+    res.status(200).json({
+        message: 'Appointment approved',
+        appointment: updatedAppointment
+    });
+
     }
 )
+
+export const rejectAppointment = asyncWrapper(async (req, res) => {
+    const { appointmentId } = req.params;
+    const { comment } = req.body;
+    const updatedAppointment = await AppointmentModel.rejectAppointment(appointmentId);
+    res.status(200).json({
+        message: 'Appointment rejected',
+        appointment: updatedAppointment
+    });
+})

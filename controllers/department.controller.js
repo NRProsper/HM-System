@@ -13,8 +13,11 @@ export const getAllDepartments = asyncWrapper(async (req, res) => {
         const limitNumber = parseInt(limit, 10);
         const skip = (pageNumber - 1) * limitNumber;
 
-        const departments = await DepartmentModel.find();
+        const departments = await DepartmentModel.find()
+            .skip(skip)
+            .limit(limitNumber);
         const totalDepartments = await DepartmentModel.countDocuments();
+
         return res.status(200).json(
             {
                 message: "Departments retrieved successfully",

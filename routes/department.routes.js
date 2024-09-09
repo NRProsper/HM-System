@@ -1,15 +1,19 @@
 import express from "express";
 import {
-    createDepartment, deleteDepartment,
-    getAllDepartments, getDepartmentById, updateDepartment
+    createDepartment,
+    deleteDepartment,
+    getAllDepartments,
+    getDepartmentById,
+    updateDepartment
 } from "../controllers/department.controller.js";
+import {authorizedRoles, verifyToken} from "../middlewares/authorization.js";
 
 const departmentRoute = express.Router();
 
 departmentRoute.get("/", getAllDepartments);
 departmentRoute.get("/:id", getDepartmentById);
-departmentRoute.post("/", createDepartment);
-departmentRoute.put("/:id", updateDepartment);
-departmentRoute.delete("/:id", deleteDepartment);
+departmentRoute.post("/",verifyToken, authorizedRoles("Admin"), createDepartment);
+departmentRoute.put("/:id", verifyToken, authorizedRoles("Admin"), updateDepartment);
+departmentRoute.delete("/:id", verifyToken, authorizedRoles("Admin"), deleteDepartment);
 
 export default departmentRoute;
