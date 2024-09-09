@@ -6,6 +6,7 @@ import {BadRequestError} from "../errors/BadRequestError.js";
 import bcrypt from "bcryptjs";
 import {validateLogin, validateUser} from "../utils/validation.js";
 import {validateRequest} from "../middlewares/validate.js";
+import {sendEmail} from "../utils/sendEmail.js";
 
 export const createUser = [
     validateUser,
@@ -36,32 +37,32 @@ export const createUser = [
 
         const htmlContent = `
         <html>
-        <body style="font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4;">
+          <body style="font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4;">
             <table width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width: 600px; margin: auto; background-color: #ffffff; border-radius: 8px; overflow: hidden;">
-                <tr>
-                    <td style="padding: 20px;">
-                        <h1 style="font-size: 24px; color: #333333; margin-top: 0;">Dear ${newUser.firstName},</h1>
-                        <p style="font-size: 16px; color: #666666;">Your account has been created successfully. Here are your credentials:</p>
-                        <table width="100%" border="0" cellspacing="0" cellpadding="10" style="background-color: #f9f9f9; border-radius: 4px; margin-bottom: 20px;">
-                            <tr>
-                                <td style="font-size: 16px; color: #333333; font-weight: bold;">Email:</td>
-                                <td style="font-size: 16px; color: #333333;">${newUser.email}</td>
-                            </tr>
-                            <tr>
-                                <td style="font-size: 16px; color: #333333; font-weight: bold;">Password:</td>
-                                <td style="font-size: 16px; color: #333333;">${password}</td>
-                            </tr>
-                        </table>
-                        <p style="font-size: 16px; color: #666666;">Please change your password after logging in.</p>
-                        <p style="font-size: 16px; color: #666666; margin-bottom: 0;">Best regards,<br>Care Sync</p>
-                    </td>
-                </tr>
+              <tr>
+                <td style="padding: 20px;">
+                  <h1 style="font-size: 24px; color: #333333; margin-top: 0;">Dear ${newUser.firstName},</h1>
+                  <p style="font-size: 16px; color: #666666;">Your account has been created successfully. Here are your credentials:</p>
+                  <table width="100%" border="0" cellspacing="0" cellpadding="10" style="background-color: #f9f9f9; border-radius: 4px; margin-bottom: 20px;">
+                    <tr>
+                      <td style="font-size: 16px; color: #333333; font-weight: bold;">Email:</td>
+                      <td style="font-size: 16px; color: #333333;">${newUser.email}</td>
+                    </tr>
+                    <tr>
+                      <td style="font-size: 16px; color: #333333; font-weight: bold;">Password:</td>
+                      <td style="font-size: 16px; color: #333333;">${password}</td>
+                    </tr>
+                  </table>
+                  <p style="font-size: 16px; color: #666666;">Please change your password after logging in.</p>
+                  <p style="font-size: 16px; color: #666666; margin-bottom: 0;">Best regards,<br>Care Sync</p>
+                </td>
+              </tr>
             </table>
-        </body>
+          </body>
         </html>
     `;
 
-        // sendEmail(newUser.role, "Your Account is created", htmlContent);
+        sendEmail(newUser.email, "Your Account is created", htmlContent);
 
         res.status(201).json({
             message: "User registered successfully!",
