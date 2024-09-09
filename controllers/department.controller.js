@@ -14,6 +14,7 @@ export const getAllDepartments = asyncWrapper(async (req, res) => {
         const skip = (pageNumber - 1) * limitNumber;
 
         const departments = await DepartmentModel.find()
+            .skip(skip)
             .limit(limitNumber);
         const totalDepartments = await DepartmentModel.countDocuments();
 
