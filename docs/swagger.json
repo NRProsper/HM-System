@@ -174,6 +174,35 @@
         }
       }
     },
+    "/staff/{id}": {
+      "delete": {
+        "summary": "Delete a staff member",
+        "description": "Delete a staff member from the database using their ID. Only accessible by Admin.",
+        "tags": ["Staff"],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "ID of the staff member to delete",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": { "description": "Staff member deleted successfully" },
+          "404": { "description": "Staff member not found" },
+          "403": { "description": "Unauthorized - Admin role required" },
+          "500": { "description": "Internal server error" }
+        }
+      }
+    },
     "/contact-us/contact-us": {
       "post": {
         "summary": "Create a message to the administrator",
@@ -260,14 +289,7 @@
       "get": {
         "summary": "List of all departments",
         "description": "Retrieve the list of all departments from the database.",
-        "tags": [
-          "Department"
-        ],
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ],
+        "tags": ["Department"],
         "responses": {
           "200": {
             "description": "Successfully retrieved a list of all departments",
@@ -278,20 +300,14 @@
               }
             }
           },
-          "404": {
-            "description": "Departments not found"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
+          "404": { "description": "Departments not found" },
+          "500": { "description": "Internal server error" }
         }
       },
       "post": {
         "summary": "Create a new department",
         "description": "This route is used to create a new department in the clinic. Only accessible by Admin.",
-        "tags": [
-          "Department"
-        ],
+        "tags": ["Department"],
         "security": [
           {
             "BearerAuth": []
@@ -315,98 +331,9 @@
               "$ref": "#/definitions/department"
             }
           },
-          "400": {
-            "description": "Invalid input data"
-          },
-          "403": {
-            "description": "Unauthorized - Admin role required"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        }
-      },
-      "put": {
-        "summary": "Update a department",
-        "description": "Update the details of an existing department by ID. Only accessible by Admin.",
-        "tags": [
-          "Department"
-        ],
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "description": "ID of the department to update",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "in": "body",
-            "name": "body",
-            "schema": {
-              "$ref": "#/definitions/department"
-            },
-            "required": true,
-            "description": "Updated department details"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Department updated successfully"
-          },
-          "404": {
-            "description": "Department not found"
-          },
-          "400": {
-            "description": "Invalid input"
-          },
-          "403": {
-            "description": "Unauthorized - Admin role required"
-          }
-        }
-      },
-      "delete": {
-        "summary": "Delete a department",
-        "description": "Delete a department from the database using its ID. Only accessible by Admin.",
-        "tags": [
-          "Department"
-        ],
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "description": "The ID of the department to delete",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "Department deleted successfully"
-          },
-          "404": {
-            "description": "Department not found"
-          },
-          "403": {
-            "description": "Unauthorized - Admin role required"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
+          "400": { "description": "Invalid input data" },
+          "403": { "description": "Unauthorized - Admin role required" },
+          "500": { "description": "Internal server error" }
         }
       }
     },
@@ -414,14 +341,7 @@
       "get": {
         "summary": "Get a department by ID",
         "description": "Retrieve a department's details from the database using its unique ID.",
-        "tags": [
-          "Department"
-        ],
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ],
+        "tags": ["Department"],
         "parameters": [
           {
             "name": "id",
@@ -451,8 +371,70 @@
             "description": "Internal server error"
           }
         }
+      },
+      "put": {
+        "summary": "Update a department",
+        "description": "Update the details of an existing department by ID. Only accessible by Admin.",
+        "tags": ["Department"],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "ID of the department to update",
+            "schema": { "type": "string" }
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/department"
+            },
+            "required": true,
+            "description": "Updated department details"
+          }
+        ],
+        "responses": {
+          "200": { "description": "Department updated successfully" },
+          "404": { "description": "Department not found" },
+          "400": { "description": "Invalid input" },
+          "403": { "description": "Unauthorized - Admin role required" }
+        }
+      },
+      "delete": {
+        "summary": "Delete a department",
+        "description": "Delete a department from the database using its ID. Only accessible by Admin.",
+        "tags": ["Department"],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the department to delete",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": { "description": "Department deleted successfully" },
+          "404": { "description": "Department not found" },
+          "403": { "description": "Unauthorized - Admin role required" },
+          "500": { "description": "Internal server error" }
+        }
       }
-    },
+    }
+  ,
     "/appointments": {
       "get": {
         "summary": "List of all appointments",
