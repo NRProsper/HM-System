@@ -38,8 +38,8 @@ const appointmentSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    comments: String
-})
+    comment: String
+}, { timestamps: true })
 
 appointmentSchema.statics.approveAppointment = async function (appointmentId) {
     const appointment = await this.findById(appointmentId);
@@ -52,6 +52,22 @@ appointmentSchema.statics.approveAppointment = async function (appointmentId) {
     }
 
     appointment.status = 'ACCEPTED';
+
+    return appointment.save();
+}
+
+appointmentSchema.statics.rejectAppointment = async function (appointmentId) {
+    const appointment = await this.findById(appointmentId);
+    if (!appointment) {
+        throw new Error('Appointment not found');
+    }
+
+    if (appointment.status !== 'PENDING') {
+        throw new Error('Appointment cannot be rejected because it is not in PENDING status');
+    }
+
+    appointment.status = 'REJECTED';
+
     return appointment.save();
 }
 
