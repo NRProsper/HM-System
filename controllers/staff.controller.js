@@ -23,10 +23,7 @@ export const getAllStaff = asyncWrapper(async (req, res, next) => {
         .skip(skip)
         .limit(limitNumber)
         .lean();
-
-    if (staff.length === 0) {
-        return res.status(200).json({ message: 'No staff found', data: [] });
-    }
+    
 
     const totalStaff = await UserModel.countDocuments(filter);
 
